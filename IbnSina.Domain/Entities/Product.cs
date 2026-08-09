@@ -3,7 +3,7 @@ namespace IbnSina.Domain.Entities
 {
     public class Product
     {
-        public int ID { get; private set; }
+        public int Id { get; private set; }
         public string Name { get; private set; }
         public string Description { get; private set; }
         public int Quantity { get; private set; }

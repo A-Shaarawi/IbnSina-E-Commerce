@@ -1,6 +1,7 @@
 ﻿using IbnSina.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
+
 namespace IbnSina.Infrastructure.Persistence;
 
 public class AppDbContext : DbContext
@@ -11,4 +12,13 @@ public class AppDbContext : DbContext
 
     public DbSet<Product> Products { get; set; }
     public DbSet<Category> Categories { get; set; }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+
+        modelBuilder.Entity<Product>()
+            .Property(p => p.Price)
+            .HasPrecision(18, 2);
+    }
 }
