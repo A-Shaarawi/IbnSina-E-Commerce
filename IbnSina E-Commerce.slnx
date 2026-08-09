@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="IbnSina E-Commerce/IbnSina E-Commerce.csproj" />
+  <Project Path="IbnSina.Application/IbnSina.Application.csproj" />
+  <Project Path="IbnSina.Domain/IbnSina.Domain.csproj" />
+  <Project Path="IbnSina.Infrastructure/IbnSina.Infrastructure.csproj" />
+</Solution>
