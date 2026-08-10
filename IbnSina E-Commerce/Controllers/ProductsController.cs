@@ -60,4 +60,35 @@ public class ProductsController : ControllerBase
 
         return Ok(result);
     }
+
+    [HttpDelete]
+    public async Task<IActionResult> Delete(int id)
+    {
+        var product = await _productRepository.GetByIdAsync(id);
+        if (product == null)
+            return NotFound();
+        await _productRepository.DeleteAsync(product);
+        return NoContent();
+    }
+    [HttpGet("{id}")]
+    public async Task<IActionResult> Get(int id)
+    {
+        var product = await _productRepository.GetByIdAsync(id);
+        if (product == null)
+            return NotFound();
+        var result = new ProductResponseDto
+        {
+            Id = product.Id,
+            Name = product.Name,
+            Description = product.Description,
+            Quantity = product.Quantity,
+            Price = product.Price,
+            IsInStock = product.IsInStock,
+            CategoryId = product.CategoryId,
+            CategoryName = product.Category.Name
+        };
+        return Ok(result);
+    }
+
+
 }
