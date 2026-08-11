@@ -26,7 +26,7 @@ public class CategoriesController : ControllerBase
                 ? "No categories found matching your search. Try different keywords."
                 : "No categories found.";
 
-            return Ok(new { message, categories = Array.Empty<Category>() });
+            return Ok(new {message});
         }
         return Ok(categories);
     }

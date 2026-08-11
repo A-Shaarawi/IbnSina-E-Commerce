@@ -39,7 +39,7 @@ public class ProductsController : ControllerBase
                     ? $"No products found under category ID {categoryId.Value}."
                     : "No products found.";
 
-            return Ok(new { message, products = Array.Empty<ProductResponseDto>() });
+            return Ok(new {message});
         }
 
 
