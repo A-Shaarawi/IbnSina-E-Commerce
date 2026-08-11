@@ -47,7 +47,7 @@ public class CategoriesController : ControllerBase
         var category = await _categoryRepository.GetByIdAsync(id);
         if (category == null)
         {
-            return NotFound();
+            return NotFound(new { message = $"No Category was found with ID {id}. Please check and try again." });
         }
         return new OkObjectResult(category);
     }

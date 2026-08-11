@@ -77,7 +77,7 @@ public class ProductsController : ControllerBase
     {
         var product = await _productRepository.GetByIdAsync(id);
         if (product == null)
-            return NotFound();
+            return NotFound(new { message = $"No product was found with ID {id}. Please check and try again." });
 
         var result = new ProductResponseDto
         {
