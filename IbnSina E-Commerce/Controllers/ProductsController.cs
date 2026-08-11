@@ -26,11 +26,12 @@ public class ProductsController : ControllerBase
             Id = p.Id,
             Name = p.Name,
             Description = p.Description,
-            Quantity = p.Quantity,
+            StockQuantity = p.StockQuantity,
             Price = p.Price,
             IsInStock = p.IsInStock,
             CategoryId = p.CategoryId,
-            CategoryName = p.Category.Name
+            CategoryName = p.Category.Name,
+            CreatedAt = p.CreatedAt
         });
 
         return Ok(result);
@@ -43,7 +44,6 @@ public class ProductsController : ControllerBase
 
         await _productRepository.AddAsync(product);
 
-        // reload it with Category populated, since AddAsync only saved CategoryId
         var saved = await _productRepository.GetByIdAsync(product.Id);
 
         var result = new ProductResponseDto
@@ -51,11 +51,12 @@ public class ProductsController : ControllerBase
             Id = saved!.Id,
             Name = saved.Name,
             Description = saved.Description,
-            Quantity = saved.Quantity,
+            StockQuantity = saved.StockQuantity,
             Price = saved.Price,
             IsInStock = saved.IsInStock,
             CategoryId = saved.CategoryId,
-            CategoryName = saved.Category.Name
+            CategoryName = saved.Category.Name,
+            CreatedAt = saved.CreatedAt
         };
 
         return Ok(result);
@@ -70,25 +71,29 @@ public class ProductsController : ControllerBase
         await _productRepository.DeleteAsync(product);
         return NoContent();
     }
+
     [HttpGet("{id}")]
     public async Task<IActionResult> Get(int id)
     {
         var product = await _productRepository.GetByIdAsync(id);
         if (product == null)
             return NotFound();
+
         var result = new ProductResponseDto
         {
             Id = product.Id,
             Name = product.Name,
             Description = product.Description,
-            Quantity = product.Quantity,
+            StockQuantity = product.StockQuantity,
             Price = product.Price,
             IsInStock = product.IsInStock,
             CategoryId = product.CategoryId,
-            CategoryName = product.Category.Name
+            CategoryName = product.Category.Name,
+            CreatedAt = product.CreatedAt
         };
         return Ok(result);
     }
+
     [HttpPut("{id}")]
     public async Task<IActionResult> Update(int id, UpdateProductDto dto)
     {
@@ -97,22 +102,25 @@ public class ProductsController : ControllerBase
             return NotFound();
 
         product.UpdateDetails(dto.Name, dto.Description, dto.Price, dto.CategoryId);
-
         await _productRepository.UpdateAsync(product);
+
+        var updated = await _productRepository.GetByIdAsync(id);
 
         var result = new ProductResponseDto
         {
-            Id = product.Id,
-            Name = product.Name,
-            Description = product.Description,
-            Quantity = product.Quantity,
-            Price = product.Price,
-            IsInStock = product.IsInStock,
-            CategoryId = product.CategoryId,
-            CategoryName = product.Category.Name
+            Id = updated!.Id,
+            Name = updated.Name,
+            Description = updated.Description,
+            StockQuantity = updated.StockQuantity,
+            Price = updated.Price,
+            IsInStock = updated.IsInStock,
+            CategoryId = updated.CategoryId,
+            CategoryName = updated.Category.Name,
+            CreatedAt = updated.CreatedAt
         };
         return Ok(result);
     }
+
     [HttpPatch("{id}")]
     public async Task<IActionResult> Patch(int id, PatchProductDto dto)
     {
@@ -121,21 +129,21 @@ public class ProductsController : ControllerBase
             return NotFound();
 
         product.PatchDetails(dto.Name, dto.Description, dto.Price, dto.CategoryId);
-
         await _productRepository.UpdateAsync(product);
 
-        var updated = await _productRepository.GetByIdAsync(id); // reload in case CategoryId changed
+        var updated = await _productRepository.GetByIdAsync(id);
 
         var result = new ProductResponseDto
         {
             Id = updated!.Id,
             Name = updated.Name,
             Description = updated.Description,
-            Quantity = updated.Quantity,
+            StockQuantity = updated.StockQuantity,
             Price = updated.Price,
             IsInStock = updated.IsInStock,
             CategoryId = updated.CategoryId,
-            CategoryName = updated.Category.Name
+            CategoryName = updated.Category.Name,
+            CreatedAt = updated.CreatedAt
         };
 
         return Ok(result);

@@ -1,5 +1,6 @@
 ﻿using IbnSina.Application.Interfaces;
 using IbnSina.Domain.Entities;
+using IbnSina.Application.DTOs;
 using Microsoft.AspNetCore.Mvc;
 
 namespace IbnSina.WebApi.Controllers;
@@ -51,18 +52,16 @@ public class CategoriesController : ControllerBase
         return new OkObjectResult(category);
     }
     [HttpPut("{id}")]
-    public async Task<IActionResult> Update(int id, Category category)
+    public async Task<IActionResult> Update(int id, UpdateCategoryDto dto)
     {
         var existingCategory = await _categoryRepository.GetByIdAsync(id);
         if (existingCategory == null)
-        {
             return NotFound();
-        }
 
-        existingCategory.SetName(category.Name);
+        existingCategory.UpdateDetails(dto.Name, dto.Description);
 
         await _categoryRepository.UpdateAsync(existingCategory);
 
-        return new OkObjectResult(existingCategory);
+        return Ok(existingCategory);
     }
 }
