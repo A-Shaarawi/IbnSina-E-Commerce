@@ -13,9 +13,18 @@ namespace IbnSina.Infrastructure.Repositories
         {
             _context = context;
         }
-        public async Task<List<Category>> GetAllAsync()
+        public async Task<List<Category>> GetAllAsync(string? search)
         {
-            return await _context.Categories.ToListAsync();
+            var query = _context.Categories.AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                query = query.Where(c =>
+                    EF.Functions.Like(c.Name, $"%{search}%") ||
+                    (c.Description != null && EF.Functions.Like(c.Description, $"%{search}%")));
+            }
+
+            return await query.ToListAsync();
         }
         public async Task<Category?> GetByIdAsync(int id)
         {

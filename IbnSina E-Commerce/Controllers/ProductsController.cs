@@ -1,6 +1,7 @@
 ﻿using IbnSina.Application.DTOs;
 using IbnSina.Application.Interfaces;
 using IbnSina.Domain.Entities;
+using IbnSina.Infrastructure.Repositories;
 using Microsoft.AspNetCore.Mvc;
 
 namespace IbnSina.WebApi.Controllers;
@@ -10,16 +11,37 @@ namespace IbnSina.WebApi.Controllers;
 public class ProductsController : ControllerBase
 {
     private readonly IProductRepository _productRepository;
+    private readonly ICategoryRepository _categoryRepository;
 
-    public ProductsController(IProductRepository productRepository)
+    public ProductsController(IProductRepository productRepository, ICategoryRepository categoryRepository)
     {
         _productRepository = productRepository;
+        _categoryRepository = categoryRepository;
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAll()
+    public async Task<IActionResult> GetAll(string? search, int? categoryId, bool activeOnly = false)
     {
-        var products = await _productRepository.GetAllAsync();
+        if (categoryId.HasValue)
+        {
+            var category = await _categoryRepository.GetByIdAsync(categoryId.Value);
+            if (category == null)
+                return NotFound(new { message = $"No category was found with ID {categoryId.Value}." });
+        }
+
+        var products = await _productRepository.GetAllAsync(search, categoryId, activeOnly);
+
+        if (!products.Any())
+        {
+            var message = !string.IsNullOrWhiteSpace(search)
+                ? "No products found matching your search. Try different keywords."
+                : categoryId.HasValue
+                    ? $"No products found under category ID {categoryId.Value}."
+                    : "No products found.";
+
+            return Ok(new { message, products = Array.Empty<ProductResponseDto>() });
+        }
+
 
         var result = products.Select(p => new ProductResponseDto
         {
@@ -99,7 +121,7 @@ public class ProductsController : ControllerBase
     {
         var product = await _productRepository.GetByIdAsync(id);
         if (product == null)
-            return NotFound();
+            return NotFound(new { message = $"No product was found with ID {id}. Please check and try again." });
 
         product.UpdateDetails(dto.Name, dto.Description, dto.Price, dto.CategoryId);
         await _productRepository.UpdateAsync(product);
@@ -126,7 +148,7 @@ public class ProductsController : ControllerBase
     {
         var product = await _productRepository.GetByIdAsync(id);
         if (product == null)
-            return NotFound();
+            return NotFound(new { message = $"No product was found with ID {id}. Please check and try again." });
 
         product.PatchDetails(dto.Name, dto.Description, dto.Price, dto.CategoryId);
         await _productRepository.UpdateAsync(product);

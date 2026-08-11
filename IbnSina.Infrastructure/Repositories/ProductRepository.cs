@@ -14,11 +14,24 @@ public class ProductRepository : IProductRepository
         _context = context;
     }
 
-    public async Task<List<Product>> GetAllAsync()
+    public async Task<List<Product>> GetAllAsync(string? search, int? categoryId, bool activeOnly)
     {
-        return await _context.Products
-            .Include(p => p.Category)
-            .ToListAsync();
+        var query = _context.Products.Include(p => p.Category).AsQueryable();
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            query = query.Where(p =>
+                EF.Functions.Like(p.Name, $"%{search}%") ||
+                (p.Description != null && EF.Functions.Like(p.Description, $"%{search}%")));
+        }
+        if (categoryId.HasValue)
+        {
+            query = query.Where(p => p.CategoryId == categoryId.Value);
+        }
+        if (activeOnly)
+        {
+            query = query.Where(p => p.StockQuantity > 0);
+        }
+        return await query.ToListAsync();
     }
 
     public async Task<Product?> GetByIdAsync(int id)

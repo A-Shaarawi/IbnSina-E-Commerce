@@ -17,10 +17,18 @@ public class CategoriesController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAll()
+    public async Task<IActionResult> GetAll(string? search)
     {
-        var categories = await _categoryRepository.GetAllAsync();
-        return new OkObjectResult(categories);
+        var categories = await _categoryRepository.GetAllAsync(search);
+        if (!categories.Any())
+        {
+            var message = !string.IsNullOrWhiteSpace(search)
+                ? "No categories found matching your search. Try different keywords."
+                : "No categories found.";
+
+            return Ok(new { message, categories = Array.Empty<Category>() });
+        }
+        return Ok(categories);
     }
     [HttpPost]
     public async Task<IActionResult> Create(Category category)
@@ -35,7 +43,7 @@ public class CategoriesController : ControllerBase
         var category = await _categoryRepository.GetByIdAsync(id);
         if (category == null)
         {
-            return NotFound();
+            return NotFound(new { message = $"No Category was found with ID {id}. Please check and try again." });
         }
         await _categoryRepository.DeleteAsync(category);
         return NoContent();
@@ -56,7 +64,7 @@ public class CategoriesController : ControllerBase
     {
         var existingCategory = await _categoryRepository.GetByIdAsync(id);
         if (existingCategory == null)
-            return NotFound();
+            return NotFound(new { message = $"No Category was found with ID {id}. Please check and try again." });
 
         existingCategory.UpdateDetails(dto.Name, dto.Description);
 
