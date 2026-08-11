@@ -61,7 +61,7 @@ public class ProductsController : ControllerBase
         return Ok(result);
     }
 
-    [HttpDelete]
+    [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {
         var product = await _productRepository.GetByIdAsync(id);
@@ -89,6 +89,55 @@ public class ProductsController : ControllerBase
         };
         return Ok(result);
     }
+    [HttpPut("{id}")]
+    public async Task<IActionResult> Update(int id, UpdateProductDto dto)
+    {
+        var product = await _productRepository.GetByIdAsync(id);
+        if (product == null)
+            return NotFound();
 
+        product.UpdateDetails(dto.Name, dto.Description, dto.Price, dto.CategoryId);
 
+        await _productRepository.UpdateAsync(product);
+
+        var result = new ProductResponseDto
+        {
+            Id = product.Id,
+            Name = product.Name,
+            Description = product.Description,
+            Quantity = product.Quantity,
+            Price = product.Price,
+            IsInStock = product.IsInStock,
+            CategoryId = product.CategoryId,
+            CategoryName = product.Category.Name
+        };
+        return Ok(result);
+    }
+    [HttpPatch("{id}")]
+    public async Task<IActionResult> Patch(int id, PatchProductDto dto)
+    {
+        var product = await _productRepository.GetByIdAsync(id);
+        if (product == null)
+            return NotFound();
+
+        product.PatchDetails(dto.Name, dto.Description, dto.Price, dto.CategoryId);
+
+        await _productRepository.UpdateAsync(product);
+
+        var updated = await _productRepository.GetByIdAsync(id); // reload in case CategoryId changed
+
+        var result = new ProductResponseDto
+        {
+            Id = updated!.Id,
+            Name = updated.Name,
+            Description = updated.Description,
+            Quantity = updated.Quantity,
+            Price = updated.Price,
+            IsInStock = updated.IsInStock,
+            CategoryId = updated.CategoryId,
+            CategoryName = updated.Category.Name
+        };
+
+        return Ok(result);
+    }
 }

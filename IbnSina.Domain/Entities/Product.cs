@@ -62,5 +62,20 @@ namespace IbnSina.Domain.Entities
                 throw new InvalidOperationException("Cannot decrease stock below zero.");
             Quantity -= amount;
         }
+        public void UpdateDetails(string name, string? description, decimal price, int categoryId)
+        {
+            SetName(name);
+            Description = description;
+            SetPrice(price);
+            SetCategoryId(categoryId);
+        }
+        public void PatchDetails(string? name, string? description, decimal? price, int? categoryId)
+        {
+            if (name != null) SetName(name);
+            if (description != null) Description = description;
+            if (price.HasValue) SetPrice(price.Value);
+            if (categoryId.HasValue) SetCategoryId(categoryId.Value);
+        }
+
     }
 }

@@ -28,7 +28,7 @@ public class CategoriesController : ControllerBase
         return new OkObjectResult(category);
     }
 
-    [HttpDelete]
+    [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {
         var category = await _categoryRepository.GetByIdAsync(id);
@@ -49,16 +49,20 @@ public class CategoriesController : ControllerBase
             return NotFound();
         }
         return new OkObjectResult(category);
-
-        //try
-        //{
-        //    return new OkObjectResult(category);
-        //}
-        //catch (Exception ex)
-        //{
-        //    return StatusCode(500, "Internal server error");
-        //}
     }
+    [HttpPut("{id}")]
+    public async Task<IActionResult> Update(int id, Category category)
+    {
+        var existingCategory = await _categoryRepository.GetByIdAsync(id);
+        if (existingCategory == null)
+        {
+            return NotFound();
+        }
 
+        existingCategory.SetName(category.Name);
+
+        await _categoryRepository.UpdateAsync(existingCategory);
+
+        return new OkObjectResult(existingCategory);
+    }
 }
-

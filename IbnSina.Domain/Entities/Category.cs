@@ -15,5 +15,6 @@
                 throw new ArgumentException("Category name cannot be empty.");
             Name = name;
         }
+
     }   
 }
