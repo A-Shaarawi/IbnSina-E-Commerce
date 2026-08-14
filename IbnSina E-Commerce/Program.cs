@@ -20,7 +20,7 @@ builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<IPasswordHasher, BCryptPasswordHasher>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
-
+builder.Services.AddScoped<ICartItemRepository, CartItemRepository>();
 var app = builder.Build();
 
 app.UseMiddleware<IbnSina.WebApi.Middleware.ExceptionHandlingMiddleware>();
