@@ -171,4 +171,31 @@ public class ProductsController : ControllerBase
 
         return Ok(result);
     }
+    [Authorize(Roles = "Admin,SuperAdmin")]
+    [HttpPost("{id}/increase-stock")]
+    public async Task<IActionResult> IncreaseStock(int id, [FromBody] StockAdjustmentDto dto)
+    {
+        var product = await _productRepository.GetByIdAsync(id);
+        if (product == null)
+            return NotFound(new { message = "Product not found." });
+
+        product.IncreaseStock(dto.Amount);
+        await _productRepository.UpdateAsync(product);
+
+        return Ok(new { product.Id, product.Name, product.StockQuantity });
+    }
+
+    [Authorize(Roles = "Admin,SuperAdmin")]
+    [HttpPost("{id}/decrease-stock")]
+    public async Task<IActionResult> DecreaseStock(int id, [FromBody] StockAdjustmentDto dto)
+    {
+        var product = await _productRepository.GetByIdAsync(id);
+        if (product == null)
+            return NotFound(new { message = "Product not found." });
+
+        product.DecreaseStock(dto.Amount);
+        await _productRepository.UpdateAsync(product);
+
+        return Ok(new { product.Id, product.Name, product.StockQuantity });
+    }
 }

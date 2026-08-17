@@ -13,9 +13,11 @@ namespace IbnSina_E_Commerce.Controllers
     public class CartsController : ControllerBase
     {
         private readonly ICartItemRepository _cartItemRepository;
-        public CartsController(ICartItemRepository cartItemRepository)
+        private readonly IProductRepository _productRepository;
+        public CartsController(ICartItemRepository cartItemRepository, IProductRepository productRepository)
         {
             _cartItemRepository = cartItemRepository;
+            _productRepository = productRepository;
         }
 
         private int GetCurrentUserId()
@@ -36,6 +38,19 @@ namespace IbnSina_E_Commerce.Controllers
         public async Task<IActionResult> AddToCart(CreateCartItemDto dto)
         {
             var userId = GetCurrentUserId();
+
+            var product = await _productRepository.GetByIdAsync(dto.ProductId);
+            if (product == null)
+                return NotFound(new { message = $"No product was found with ID {dto.ProductId}." });
+
+            if (product.StockQuantity < dto.Quantity)
+            {
+                return BadRequest(new
+                {
+                    message = $"Only {product.StockQuantity} unit(s) of '{product.Name}' available. You requested {dto.Quantity}."
+                });
+            }
+
             var cartItem = new CartItem(userId, dto.ProductId, dto.Quantity);
             await _cartItemRepository.AddAsync(cartItem);
 
@@ -63,8 +78,21 @@ namespace IbnSina_E_Commerce.Controllers
             if (cartItem == null)
                 return NotFound(new { message = $"No Cart Item was found with ID {id}. Please check and try again." });
 
+            var product = await _productRepository.GetByIdAsync(cartItem.ProductId);
+            if (product == null)
+                return NotFound(new { message = "The product for this cart item no longer exists." });
+
+            if (product.StockQuantity < dto.Quantity)
+            {
+                return BadRequest(new
+                {
+                    message = $"Only {product.StockQuantity} unit(s) of '{product.Name}' available. You requested {dto.Quantity}."
+                });
+            }
+
             cartItem.UpdateQuantity(dto.Quantity);
             await _cartItemRepository.UpdateAsync(cartItem);
+
             return Ok(cartItem);
         }
 
