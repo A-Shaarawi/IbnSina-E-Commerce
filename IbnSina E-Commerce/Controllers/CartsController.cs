@@ -31,6 +31,9 @@ namespace IbnSina_E_Commerce.Controllers
         {
             var userId = GetCurrentUserId();
             var cartItems = await _cartItemRepository.GetAllAsync(userId);
+            if (!cartItems.Any())
+                return Ok(new { message = "Cart is empty." });
+
             return Ok(cartItems);
         }
 
@@ -55,7 +58,7 @@ namespace IbnSina_E_Commerce.Controllers
             await _cartItemRepository.AddAsync(cartItem);
 
             var saved = await _cartItemRepository.GetByIdAsync(cartItem.Id, userId);
-            return Ok(saved);
+            return Ok(new { message = "Added Successfully", item = saved });
         }
 
         [HttpDelete("{id}")]
@@ -93,7 +96,7 @@ namespace IbnSina_E_Commerce.Controllers
             cartItem.UpdateQuantity(dto.Quantity);
             await _cartItemRepository.UpdateAsync(cartItem);
 
-            return Ok(cartItem);
+            return Ok(new { message = "Updated Successfully", item = cartItem });
         }
 
         [HttpDelete("clear")]
