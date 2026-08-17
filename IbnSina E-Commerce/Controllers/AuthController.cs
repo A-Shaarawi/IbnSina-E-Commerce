@@ -46,12 +46,37 @@ public class AuthController : ControllerBase
     public async Task<IActionResult> Login(LoginDto dto)
     {
         var user = await _userRepository.GetByEmailAsync(dto.Email);
-        if (user == null || !_passwordHasher.Verify(dto.Password, user.HashedPassword))
+        if (user == null)
             return Unauthorized(new { message = "Invalid email or password." });
+
+        if (user.IsCurrentlyLockedOut())
+        {
+            if (user.IsBlocked)
+                return StatusCode(423, new { message = "Your account is permanently blocked. Contact an administrator to unlock it." });
+
+            return StatusCode(423, new { message = $"Too many failed attempts. Try again after {user.LockoutEnd:HH:mm:ss} UTC." });
+        }
+
+        if (!_passwordHasher.Verify(dto.Password, user.HashedPassword))
+        {
+            user.RegisterFailedLogin();
+            await _userRepository.UpdateAsync(user);
+
+            if (user.IsBlocked)
+                return StatusCode(423, new { message = "Too many failed attempts. Your account is now permanently blocked. Contact an administrator to unlock it." });
+
+            if (user.LockoutEnd.HasValue)
+                return StatusCode(423, new { message = $"Too many failed attempts. Try again after {user.LockoutEnd:HH:mm:ss} UTC." });
+
+            return Unauthorized(new { message = "Invalid email or password." });
+        }
+
+        user.RegisterSuccessfulLogin();
+        await _userRepository.UpdateAsync(user);
 
         var token = _tokenService.GenerateToken(user);
 
-        return Ok(new { token, user.Id, user.Name, user.Email });
+        return Ok(new { token, user.Id, user.Name, user.Email, user.Role });
     }
 
     [Authorize]

@@ -1,6 +1,7 @@
-﻿using IbnSina.Application.Interfaces;
+﻿using IbnSina.Application.DTOs;
+using IbnSina.Application.Interfaces;
 using IbnSina.Domain.Entities;
-using IbnSina.Application.DTOs;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace IbnSina.WebApi.Controllers;
@@ -30,13 +31,14 @@ public class CategoriesController : ControllerBase
         }
         return Ok(categories);
     }
+    [Authorize(Roles = "Admin,SuperAdmin")]
     [HttpPost]
     public async Task<IActionResult> Create(Category category)
     {
         await _categoryRepository.AddAsync(category);
         return new OkObjectResult(category);
     }
-
+    [Authorize(Roles = "Admin,SuperAdmin")]
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {
@@ -59,6 +61,7 @@ public class CategoriesController : ControllerBase
         }
         return new OkObjectResult(category);
     }
+    [Authorize(Roles = "Admin,SuperAdmin")]
     [HttpPut("{id}")]
     public async Task<IActionResult> Update(int id, UpdateCategoryDto dto)
     {

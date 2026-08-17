@@ -3,6 +3,7 @@ using IbnSina.Application.Interfaces;
 using IbnSina.Domain.Entities;
 using IbnSina.Infrastructure.Repositories;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace IbnSina.WebApi.Controllers;
 
@@ -58,11 +59,11 @@ public class ProductsController : ControllerBase
 
         return Ok(result);
     }
-
+    [Authorize(Roles = "Admin,SuperAdmin")]
     [HttpPost]
     public async Task<IActionResult> Create(CreateProductDto dto)
     {
-        var product = new Product(dto.Name, dto.Description, dto.Quantity, dto.Price, dto.CategoryId);
+        var product = new Product(dto.Name, dto.Description, dto.StockQuantity, dto.Price, dto.CategoryId);
 
         await _productRepository.AddAsync(product);
 
@@ -83,7 +84,7 @@ public class ProductsController : ControllerBase
 
         return Ok(result);
     }
-
+    [Authorize(Roles = "Admin,SuperAdmin")]
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {
@@ -115,7 +116,7 @@ public class ProductsController : ControllerBase
         };
         return Ok(result);
     }
-
+    [Authorize(Roles = "Admin,SuperAdmin")]
     [HttpPut("{id}")]
     public async Task<IActionResult> Update(int id, UpdateProductDto dto)
     {
@@ -142,7 +143,7 @@ public class ProductsController : ControllerBase
         };
         return Ok(result);
     }
-
+    [Authorize(Roles = "Admin,SuperAdmin")]
     [HttpPatch("{id}")]
     public async Task<IActionResult> Patch(int id, PatchProductDto dto)
     {

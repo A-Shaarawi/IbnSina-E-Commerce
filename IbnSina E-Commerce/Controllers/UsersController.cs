@@ -1,6 +1,7 @@
 ﻿using IbnSina.Application.DTOs;
 using IbnSina.Application.Interfaces;
 using IbnSina.Domain.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace IbnSina.WebApi.Controllers;
@@ -17,7 +18,7 @@ public class UsersController : ControllerBase
         _userRepository = userRepository;
         _passwordHasher = passwordHasher;
     }
-
+    [Authorize(Roles = "Admin,SuperAdmin")]
     [HttpGet]
     public async Task<IActionResult> GetAll(string? search)
     {
@@ -32,7 +33,7 @@ public class UsersController : ControllerBase
         var result = users.Select(u => new { u.Id, u.Name, u.Email, u.CreatedAt });
         return Ok(result);
     }
-
+    [Authorize(Roles = "Admin,SuperAdmin")]
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(int id)
     {
@@ -43,7 +44,7 @@ public class UsersController : ControllerBase
         var result = new { user.Id, user.Name, user.Email, user.CreatedAt };
         return Ok(result);
     }
-
+    [Authorize(Roles = "Admin,SuperAdmin")]
     [HttpPost]
     public async Task<IActionResult> Create(CreateUserDto dto)
     {
@@ -63,16 +64,34 @@ public class UsersController : ControllerBase
             user.CreatedAt
         });
     }
-
+    [Authorize(Roles = "Admin,SuperAdmin")]
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {
         var user = await _userRepository.GetByIdAsync(id);
         if (user == null)
             return NotFound(new { message = "User not found." });
+        //if (user.Role == Role.SuperAdmin)
+        //    return BadRequest(new { message = "SuperAdmin accounts cannot be deleted." });
 
         await _userRepository.DeleteAsync(user);
         return Ok(new { message = "User deleted successfully." });
+    }
+    [Authorize(Roles = "SuperAdmin")]
+    [HttpPost("{id}/promote")]
+    public async Task<IActionResult> PromoteToAdmin(int id)
+    {
+        var user = await _userRepository.GetByIdAsync(id);
+        if (user == null)
+            return NotFound(new { message = "User not found." });
+
+        if (user.Role != Role.User)
+            return BadRequest(new { message = "Only plain User accounts can be promoted to Admin." });
+
+        user.PromoteToAdmin();
+        await _userRepository.UpdateAsync(user);
+
+        return Ok(new { message = $"{user.Email} has been promoted to Admin." });
     }
 
     private bool IsPasswordStrong(string password, out string error)
