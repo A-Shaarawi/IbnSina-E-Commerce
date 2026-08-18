@@ -71,8 +71,8 @@ public class UsersController : ControllerBase
         var user = await _userRepository.GetByIdAsync(id);
         if (user == null)
             return NotFound(new { message = "User not found." });
-        //if (user.Role == Role.SuperAdmin)
-        //    return BadRequest(new { message = "SuperAdmin accounts cannot be deleted." });
+        if (user.Role == Role.SuperAdmin)
+            return BadRequest(new { message = "SuperAdmin accounts cannot be deleted." });
 
         await _userRepository.DeleteAsync(user);
         return Ok(new { message = "User deleted successfully." });

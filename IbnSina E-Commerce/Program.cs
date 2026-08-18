@@ -74,7 +74,7 @@ builder.Services.AddAuthentication(options =>
     {
         OnChallenge = async context =>
         {
-            context.HandleResponse(); // stop the default empty-body 401
+            context.HandleResponse();
             context.Response.StatusCode = 401;
             context.Response.ContentType = "application/json";
             await context.Response.WriteAsync(
