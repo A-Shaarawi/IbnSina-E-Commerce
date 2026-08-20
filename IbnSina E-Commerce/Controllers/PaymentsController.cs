@@ -1,4 +1,5 @@
-﻿using IbnSina.Application.Interfaces;
+﻿// Handles payment processing requests and records payment details for customer orders.
+using IbnSina.Application.Interfaces;
 using IbnSina.Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
