@@ -13,14 +13,11 @@ class LoginPage extends StatelessWidget {
       body: Center(
         child: Column(
           children: [
-            SizedBox(height: 80),
-            Text(
-              'Ibnsina Pharma',
-              style: TextStyle(
-                fontSize: 26,
-                fontWeight: FontWeight.bold,
-                color: primaryColor,
-              ),
+            SizedBox(height: 20),
+            Image.asset(
+              'assets/images/ibnsina-pharma-logo.png',
+              width: 200,
+              height: 200,
             ),
             Text(
               "Login to your account",
