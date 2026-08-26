@@ -14,27 +14,28 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  final TextEditingController _phoneController = TextEditingController();
+  final TextEditingController _nameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
   void _handleLogin() {
-    final phone = _phoneController.text;
+    final name = _nameController.text;
     final password = _passwordController.text;
 
-    if (phone.isEmpty || password.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Phone number and password are required')),
-      );
+    if (name.isEmpty || password.isEmpty) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Name and password are required')));
       return;
     }
+
     Navigator.of(context).pushReplacement(
-      MaterialPageRoute(builder: (context) => const HomePage()),
+      MaterialPageRoute(builder: (context) => HomePage(name: name)),
     );
   }
 
   @override
   void dispose() {
-    _phoneController.dispose();
+    _nameController.dispose();
     _passwordController.dispose();
     super.dispose();
   }
@@ -61,9 +62,9 @@ class _LoginPageState extends State<LoginPage> {
               child: Column(
                 children: [
                   TextField(
-                    controller: _phoneController,
+                    controller: _nameController,
                     decoration: InputDecoration(
-                      labelText: 'Phone Number',
+                      labelText: 'Name',
                       labelStyle: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight(300),
