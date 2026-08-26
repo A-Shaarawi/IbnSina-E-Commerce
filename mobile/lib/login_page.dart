@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'home_page.dart';
+
 const Color primaryColor = Color.fromARGB(255, 69, 80, 156);
 const Color accentColor = Color(0xFFE91E63);
 const Color forgotPasswordColor = Color.fromARGB(255, 187, 119, 119);
@@ -25,6 +27,9 @@ class _LoginPageState extends State<LoginPage> {
       );
       return;
     }
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(builder: (context) => const HomePage()),
+    );
   }
 
   @override
