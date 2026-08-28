@@ -12,9 +12,9 @@ class _ImageCarouselState extends State<ImageCarousel> {
   int _currentPage = 0;
 
   final List<String> _images = [
-    'assets/images/ibnsina-pharma-logo.png',
-    'assets/images/ibnsina-pharma-logo.png',
-    'assets/images/ibnsina-pharma-logo.png',
+    'assets/images/panadol-extra.png',
+    'assets/images/prospan.png',
+    'assets/images/ear-drops.png',
   ];
 
   @override
@@ -37,7 +37,7 @@ class _ImageCarouselState extends State<ImageCarousel> {
               });
             },
             children: _images.map((imagePath) {
-              return Image.asset(imagePath, fit: BoxFit.cover);
+              return Image.asset(imagePath, fit: BoxFit.contain);
             }).toList(),
           ),
         ),
